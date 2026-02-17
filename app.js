@@ -151,16 +151,17 @@ function mouseMoveHandler(e) {
     //on the center of the screen. (suggesting to the user what he is about to do)
     //if you release it it goes away. I set it to be displayed after you swiped past 25%(aprox) of the vw
 
-    if (offsetX > halfWrapper / 2) {
-      heartOverlay.classList.add("show");
-    } else {
-      heartOverlay.classList.remove("show");
-    }
-    if (offsetX < -halfWrapper / 2) {
-      nopeOverlay.classList.add("show");
-    } else {
-      nopeOverlay.classList.remove("show");
-    }
+    //dont like the look of this on mobile
+    // if (offsetX > halfWrapper / 2) {
+    //   heartOverlay.classList.add("show");
+    // } else {
+    //   heartOverlay.classList.remove("show");
+    // }
+    // if (offsetX < -halfWrapper / 2) {
+    //   nopeOverlay.classList.add("show");
+    // } else {
+    //   nopeOverlay.classList.remove("show");
+    // }
   }
 }
 
@@ -184,7 +185,7 @@ function mouseUpHandler(e) {
   // console.log(`${offsetX} ${swipeSpeed}`);
   //the condition for swiping is: if we moved the mouse for at least 25% of the width and the speed > swipeSpeed than it is
   //considered a valid swipe
-  swipeOffsetLimit = halfWrapper / 3;
+  swipeOffsetLimit = halfWrapper / 4;
   if (
     (offsetX > swipeOffsetLimit && swipeSpeed > 1) ||
     (offsetX < -swipeOffsetLimit && swipeSpeed > 1)
