@@ -184,7 +184,7 @@ function mouseUpHandler(e) {
   // console.log(`${offsetX} ${swipeSpeed}`);
   //the condition for swiping is: if we moved the mouse for at least 25% of the width and the speed > swipeSpeed than it is
   //considered a valid swipe
-  swipeOffsetLimit = halfWrapper - 20;
+  swipeOffsetLimit = halfWrapper / 3;
   if (
     (offsetX > swipeOffsetLimit && swipeSpeed > 1) ||
     (offsetX < -swipeOffsetLimit && swipeSpeed > 1)
