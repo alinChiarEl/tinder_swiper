@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"
+      defer
+    ></script>
+
+    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- gsap for some small animations  -->
+
+    <title>Tinder Like Swiper</title>
+    <script defer>
+      // the menu script
+      // document.addEventListener("DOMContentLoaded", () => {
+      //   async function init() {
+      //     fetch("/partials/menu.html")
+      //       .then((r) => r.text())
+      //       .then((html) => (document.getElementById("menu").innerHTML = html));
+      //   }
+      //   init();
+      // });
+    </script>
+  </head>
+  <!-- <div id="menu" class="absolute"></div> -->
+  <body>
+    <div class="wrapper">
+      <!-- we fill the wrapper with cards from app.js  -->
+      <div class="buttons">
+        <div class="btn dislike">✕</div>
+        <div class="btn like">❤</div>
+      </div>
+    </div>
+    <!-- <div id="message"></div> -->
+    <div class="heart-overlay">❤</div>
+    <div class="nope-overlay">✕</div>
+  </body>
+</html>
