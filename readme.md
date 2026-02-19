@@ -14,6 +14,7 @@ A tinder-like swiper using javascript, html and css. No libraries and frameworks
 - If somebody wants to implement this be careful to always have this in your css on the swipeable element.
   touch-action: none !important;
 - Without this the browser will randomly cancel your pointer event but only on mobile. More details in the code.
+- There are 4 variables that define transition speed. Adapt them to your needs.
 
 # Tech Stack
 

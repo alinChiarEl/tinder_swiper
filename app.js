@@ -5,8 +5,15 @@ let startX = 0;
 let offsetX = 0; //this is how much we move the picture, left(-) or right(+)
 let isDragging = false;
 let currentElement = {};
+let currentIndex = 0; //this is used for X/Heart buttons
 let animationID = 0;
 let swipeOffsetLimit = 0; //how much of the vw we must swipe to be considered a valid swipe
+
+//transition speed
+let dragAnimationTransition = "0.05s";
+let reverseAnimationTransition = "0.2s";
+let releaseAnimationTransition = "0.4s";
+let buttonsAnimationTransition = "0.7s";
 
 //vars needed for calculating swipeSpeed, cause this is how
 //bumble determines when to trigger a swipe
@@ -19,49 +26,42 @@ halfWrapper = document.querySelector(".wrapper").offsetWidth / 2 - 15;
 // console.log(halfWrapper);
 let sign = "";
 
-//we show this while isDragging is true and the offsetX exceeds a certain value
-//we remove it when:
-// *cancel swipe
-// *finish swipe(removeCard function)
-let heartOverlay = document.querySelector(".heart-overlay");
-let nopeOverlay = document.querySelector(".nope-overlay");
-
 const wrapper = document.querySelector(".wrapper");
 const message = document.getElementById("message");
 
-function love() {
-  //get first slide
-  if (slides.length > 2) {
-    currentElement = slides[slides.length - 1];
+let timeoutId = 0;
 
-    offsetX = 500;
-    animationID = requestAnimationFrame(animation);
-    // cancelAnimationFrame(animationID);
-    removeCard();
+function love(e) {
+  clearTimeout(timeoutId);
+  key = e.currentTarget;
 
-    slides = Array.from(document.querySelectorAll(".card:not(.remove)"));
-    currentElement = slides[slides.length - 1];
-    console.log(currentElement);
-  } else {
-    console.log("we finished the slides");
-  }
+  key.classList.add("keypress");
+
+  timeoutId = setTimeout(() => {
+    key.classList.remove("keypress");
+  }, 200);
+
+  currentElement = slides[currentIndex];
+  currentElement.style.transform = `translateX(500px) rotate(10deg)`;
+  currentElement.style.transition = `transform ${buttonsAnimationTransition} linear`;
+
+  currentIndex--;
 }
 
-function nope() {
-  if (slides.length > 2) {
-    currentElement = slides[slides.length - 1];
+function nope(e) {
+  clearTimeout(timeoutId);
+  key = e.currentTarget;
 
-    offsetX = -500;
-    animationID = requestAnimationFrame(animation);
-    // cancelAnimationFrame(animationID);
-    removeCard();
+  key.classList.add("keypress");
 
-    slides = Array.from(document.querySelectorAll(".card:not(.remove)"));
-    currentElement = slides[slides.length - 1];
-    // console.log(currentElement);
-  } else {
-    console.log("we finished the slides");
-  }
+  timeoutId = setTimeout(() => {
+    key.classList.remove("keypress");
+  }, 200);
+
+  currentElement = slides[currentIndex];
+  currentElement.style.transform = `translateX(-500px) rotate(-10deg)`;
+  currentElement.style.transition = `transform ${buttonsAnimationTransition} linear`;
+  currentIndex--;
 }
 
 function init() {
@@ -75,13 +75,15 @@ function init() {
   let pic = 0;
   for (let i = 1; i < 100; i++) {
     pic = (i % 6) + 1;
-    html += `<div id="${pic}" class="card">
+    html += `<div data-index="${i}" id="${pic}" class="card">
         <img src="assets/${pic}.jpg" alt="" />
         <div class = 'textOnPic'>
         <h2>Kate, 4${pic}</h2>
         
         </div>
       </div>`;
+
+    currentIndex = i;
   }
 
   html += `<div class="buttons">
@@ -99,17 +101,7 @@ function init() {
   slides.forEach((slide, index) => {
     slide.addEventListener("dragstart", (e) => e.preventDefault());
 
-    //mouse events(replaced with pointer events)
-    // slide.addEventListener("mousedown", (e) => mouseDownHandler(e, index));
-    // slide.addEventListener("mouseup", (e) => mouseUpHandler(e, index));
-    // slide.addEventListener("mousemove", (e) => mouseMoveHandler(e, index));
-    slide.addEventListener("click", (e) => mouseMoveHandler(e));
-
-    //touch events(replaced with pointer events)
-
-    // slide.addEventListener("touchstart", (e) => mouseDownHandler(e, index));
-    // slide.addEventListener("touchend", mouseUpHandler);
-    // slide.addEventListener("touchmove", mouseMoveHandler);
+    // slide.addEventListener("click", (e) => mouseMoveHandler(e));
 
     //these should work for both mouse and touch events
     slide.addEventListener("pointerdown", (e) => mouseDownHandler(e, index));
@@ -131,11 +123,13 @@ function mouseDownHandler(e, index) {
   startTime = Date.now();
   startX = getPositionX(e); //get the position of the mouse click
   currentElement = e.currentTarget;
+
+  // console.log(`OffsetX ${offsetX} StartX ${startX}`);
   animationID = requestAnimationFrame(animation); //start the animation
 }
 
 function getPositionX(event) {
-  return event.clientX;
+  return Math.floor(event.clientX);
 
   //this line works if we split the events using mouse and touch
   // return event.type.includes("mouse") ? event.pageX : event.touches[0].clientX;
@@ -145,23 +139,6 @@ function getPositionX(event) {
 function mouseMoveHandler(e) {
   if (isDragging) {
     offsetX = getPositionX(e) - startX;
-    // console.log("MouseMove " + offsetX);
-
-    //When you hold a card and swipe it displays a heart(if you go right) or an X(if you go left)
-    //on the center of the screen. (suggesting to the user what he is about to do)
-    //if you release it it goes away. I set it to be displayed after you swiped past 25%(aprox) of the vw
-
-    //dont like the look of this on mobile
-    // if (offsetX > halfWrapper / 2) {
-    //   heartOverlay.classList.add("show");
-    // } else {
-    //   heartOverlay.classList.remove("show");
-    // }
-    // if (offsetX < -halfWrapper / 2) {
-    //   nopeOverlay.classList.add("show");
-    // } else {
-    //   nopeOverlay.classList.remove("show");
-    // }
   }
 }
 
@@ -169,12 +146,14 @@ function animation(timestamp) {
   sign = Math.sign(offsetX);
 
   currentElement.style.transform = `translateX(${offsetX}px) rotate(${sign}0deg)`;
+  currentElement.style.transition = `transform ${dragAnimationTransition} linear`;
   animationID = requestAnimationFrame(animation);
 }
 
 function reverseAnimation() {
   offsetX = 0;
   currentElement.style.transform = `translateX(${offsetX}px) rotate(0deg)`;
+  currentElement.style.transition = `transform ${reverseAnimationTransition} linear`;
 }
 
 function mouseUpHandler(e) {
@@ -182,19 +161,22 @@ function mouseUpHandler(e) {
   endTime = Date.now();
 
   swipeSpeed = Math.abs(offsetX / (endTime - startTime));
-  // console.log(`${offsetX} ${swipeSpeed}`);
-  //the condition for swiping is: if we moved the mouse for at least 25% of the width and the speed > swipeSpeed than it is
-  //considered a valid swipe
+
+  // the condition for swiping is: if we moved the mouse for
+  // at least X% of the width and the speed > swipeSpeed than it is
+  // considered a valid swipe. Play around with it
 
   if (
     (offsetX > halfWrapper / 2 && swipeSpeed > 0.4) ||
     (offsetX < -halfWrapper / 2 && swipeSpeed > 0.4)
   ) {
-    console.log(
+    console.warn(
       `OffsetX: ${offsetX} swipeOffsetLimit ${
         halfWrapper / 2
       } Speed: ${swipeSpeed}`
     );
+
+    currentIndex--;
 
     if (offsetX > 0) {
       offsetX = offsetX + 500;
@@ -204,29 +186,16 @@ function mouseUpHandler(e) {
     // console.log(offsetX + " - " + swipeSpeed);
 
     currentElement.style.transform = `translateX(${offsetX}px) rotate(${sign}0deg)`;
-
+    currentElement.style.transition = `transform ${releaseAnimationTransition} linear`;
+    console.log(currentElement.style.transition);
+    offsetX = 0;
     cancelAnimationFrame(animationID);
-
-    removeCard();
   } else {
-    console.log(
-      `OffsetX: ${offsetX} swipeOffsetLimit ${swipeOffsetLimit} Speed: ${swipeSpeed}`
-    );
-    // console.log("cancel swipe, speed too low " + swipeSpeed);
     reverseAnimation(); //move the slide back into position
     cancelAnimationFrame(animationID);
-    heartOverlay.classList.remove("show");
-    nopeOverlay.classList.remove("show");
+
     sign = -1 * sign;
   }
-}
-
-function removeCard() {
-  setTimeout(() => {
-    currentElement.classList.add("remove");
-  }, 500);
-  heartOverlay.classList.remove("show");
-  nopeOverlay.classList.remove("show");
 }
 
 init();
