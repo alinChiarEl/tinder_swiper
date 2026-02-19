@@ -170,11 +170,11 @@ function mouseUpHandler(e) {
     (offsetX > halfWrapper / 2 && swipeSpeed > 0.4) ||
     (offsetX < -halfWrapper / 2 && swipeSpeed > 0.4)
   ) {
-    console.warn(
-      `OffsetX: ${offsetX} swipeOffsetLimit ${
-        halfWrapper / 2
-      } Speed: ${swipeSpeed}`
-    );
+    // console.warn(
+    //   `OffsetX: ${offsetX} swipeOffsetLimit ${
+    //     halfWrapper / 2
+    //   } Speed: ${swipeSpeed}`
+    // );
 
     currentIndex--;
 
@@ -187,7 +187,6 @@ function mouseUpHandler(e) {
 
     currentElement.style.transform = `translateX(${offsetX}px) rotate(${sign}0deg)`;
     currentElement.style.transition = `transform ${releaseAnimationTransition} linear`;
-    console.log(currentElement.style.transition);
     offsetX = 0;
     cancelAnimationFrame(animationID);
   } else {
